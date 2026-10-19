@@ -15,4 +15,4 @@ The team consists of 5 agents:
 ## How to use these files
 1. Copy `agents.yaml` and `tasks.yaml` into your `config/` directory.
 2. In your `crew.py`, register the `adversarial_reviewer` agent and the `adversarial_task`.
-3. To enforce the gate, your webhook (or main script) should read the `output/adversarial_review.md` file. If it contains `ADVERSARIAL_REVIEW: FAIL`, halt the pipeline and route the ticket to a `Human-in-the-Loop` state.
+3. To enforce the gate, your Azure DevOps / JIRA -> CrewAI -> W&B webhook (or main script) should read the `output/adversarial_review.md` file created by the Adversarial Reviewer Agent. If it contains `ADVERSARIAL_REVIEW: FAIL`, halt the pipeline and route the Azure DevOps or JIRA ticket to a `Human-in-the-Loop` state.
