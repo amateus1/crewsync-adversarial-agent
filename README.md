@@ -2,7 +2,7 @@
 
 This repository contains the CrewAI configuration for an autonomous engineering team with a built-in **Adversarial Testing Gate** (LLM-as-a-judge). 
 
-This setup was featured in my LinkedIn article: [Why Enterprise AI Needs Adversarial Testing](#).
+This setup was featured in my LinkedIn article: [Why Enterprise AI Needs Adversarial Testing](https://www.linkedin.com/pulse/why-enterprise-ai-needs-adversarial-testing-how-i-built-al-mateus-s3soc/).
 
 ## The Architecture
 The team consists of 5 agents:
