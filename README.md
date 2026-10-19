@@ -13,7 +13,7 @@ The team consists of 5 agents:
 5.  **Adversarial Reviewer:** The Red Team. It independently audits the code, finds security flaws, and outputs a `FAIL` verdict to block deployment to production.
 
 6.  ## 📄 Example Output
-Check out [`sample_report.md`](./sample_report.md) to see exactly what the Red Team agent produces. It highlights a real "infinite money glitch" (a rounding exploit) it caught in a stock trading app simulation that had passed all standard unit tests
+Check out [`adversarial_review.md`](./adversarial_review.md) to see exactly what the Red Team agent produces. It highlights a real "infinite money glitch" (a rounding exploit) it caught in a stock trading app simulation that had passed all standard unit tests
 
 ## How to use these files
 1. Copy `agents.yaml` and `tasks.yaml` into your CrewAI project's `config/` directory.
