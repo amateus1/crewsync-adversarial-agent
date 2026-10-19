@@ -1,0 +1,142 @@
+design_task:
+  description: >
+    Take the high level requirements described here and prepare a detailed design for the engineer;
+    everything should be in 1 python module, but outline the classes and methods in the module.
+    Here are the requirements: {requirements}
+    IMPORTANT: Only output the design in markdown format, laying out in detail the classes and functions in the module, describing the functionality.
+  expected_output: >
+    A detailed design for the engineer, identifying the classes and functions in the module.
+  agent: engineering_lead
+  output_file: output/{module_name}_design.md
+
+code_task:
+  description: >
+    Write a python module that implements the design described by the engineering lead, in order to achieve the requirements.
+    Here are the requirements: {requirements}
+  expected_output: >
+    A python module that implements the design and achieves the requirements.
+    IMPORTANT: Output ONLY the raw Python code without any markdown formatting, code block delimiters, or backticks.
+    The output should be valid Python code that can be directly saved to a file and executed.
+  agent: backend_engineer
+  context:
+    - design_task
+  output_file: output/{module_name}
+
+frontend_task:
+  description: >
+    Write a gradio UI in a module app.py that demonstrates the given backend class in {module_name}.
+    Assume there is only 1 user, and keep the UI very simple indeed - just a prototype or demo.
+    You will write the UI with all text fields and outputs in both English and Chinese Language. 
+    Here are the requirements: {requirements}
+  expected_output: >
+    A gradio UI in module app.py that demonstrates the given backend class.
+    The file should be ready so that it can be run as-is, in the same directory as the backend module, and it should import the backend class from {module_name}.
+    IMPORTANT: Output ONLY the raw Python code without any markdown formatting, code block delimiters, or backticks.
+    The output should be valid Python code that can be directly saved to a file and executed.
+  agent: frontend_engineer
+  context:
+    - code_task
+  output_file: output/app.py
+
+test_task:
+  description: >
+    Validate the backend module and frontend app.
+    
+    STEP 1: Check accounts.py exists and compiles
+    STEP 2: Check app.py exists and compiles
+    STEP 3: Check app.py has encoding declaration
+    STEP 4: Check app.py has bilingual labels (contain " / ")
+    STEP 5: Check app.py launch configuration
+    
+    If any step fails:
+    - Identify which agent (backend_engineer or frontend_engineer) caused the issue
+    - Output the specific error
+    - Provide corrected code
+    
+    Use the CodeInterpreterTool to run validation safely.
+  expected_output: >
+    Validation report. If errors found, include corrected code.
+  agent: test_engineer
+  context:
+    - code_task
+    - frontend_task
+  output_file: output/validation_report.txt
+
+
+adversarial_task:
+  description: >
+    You are the adversarial reviewer. Attack the artifacts produced by the engineering team
+    and produce a structured findings report.
+
+    Inputs you must review (all available via context):
+    - The design (output/{module_name}_design.md content)
+    - The backend module (output/{module_name})
+    - The frontend module (output/app.py)
+    - The test file (output/test_{module_name})
+    - The validation report (output/validation_report.txt)
+    - The original requirements: {requirements}
+
+    PROCEDURE:
+    1. Read each artifact end to end.
+    2. For each of the four categories below, enumerate concrete attack vectors
+       and test each one against the artifact:
+         A. Architecture / design flaws
+         B. Backend correctness, safety, and requirement coverage
+         C. Frontend correctness, bilingual compliance, launch config
+         D. Test quality (does the test suite actually catch bugs?)
+    3. For EVERY finding you must:
+       - Cite the specific file and (where possible) the line or symbol
+       - Quote the offending code or describe the reproduction
+       - Classify severity: CRITICAL / HIGH / MEDIUM / LOW
+       - Classify confidence: CONFIRMED / SUSPECTED / DISMISSED
+       - Give a concrete, minimal recommendation
+    4. Also list every requirement from the requirements text and state
+       VERIFIED / PARTIAL / MISSING with evidence.
+    5. End with a one-line verdict on its own line, exactly in this format:
+       ADVERSARIAL_REVIEW: PASS
+       or
+       ADVERSARIAL_REVIEW: REVIEW
+       or
+       ADVERSARIAL_REVIEW: FAIL
+       Use FAIL if any CRITICAL or HIGH finding is CONFIRMED or SUSPECTED.
+       Use REVIEW if only MEDIUM/LOW findings exist.
+       Use PASS if no findings hold.
+
+    TONE: hostile to the code, not to the author. No praise. No filler.
+    If you cannot find a defect in a category after genuine effort, say so explicitly.
+  expected_output: >
+    A structured markdown report with these sections:
+
+    # Adversarial Review - {module_name}
+
+    ## Verdict
+    ADVERSARIAL_REVIEW: PASS|REVIEW|FAIL
+
+    ## Findings
+    ### CRITICAL
+    - [CONFIRMED] <title>
+        File: output/...
+        Evidence: ...
+        Recommendation: ...
+    ### HIGH
+    ...
+    ### MEDIUM
+    ...
+    ### LOW
+    ...
+
+    ## Requirements Coverage
+    - Requirement: ... - VERIFIED / PARTIAL / MISSING
+
+    ## Dismissed Concerns
+    - <concern> - DISMISSED because ...
+
+    If there are no findings in a severity band, write "None." under that heading.
+    The very last non-empty line of the report must be the ADVERSARIAL_REVIEW verdict line.
+  agent: adversarial_reviewer
+  context:
+    - design_task
+    - code_task
+    - frontend_task
+    - test_task
+  output_file: output/adversarial_review.md  
